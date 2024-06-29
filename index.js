@@ -266,7 +266,7 @@ app.get('/sendToHR/:id/:user_id',async (req,res) => {
     if (req.session.user == req.params.user_id) {
         let dept_id = await db.query('select department_id from grievance where id=$1;',[req.params.id]);
         dept_id = dept_id.rows[0].department_id
-        await db.query('update grievance set sent_to_department_id=$1,status=\'sent to hr\' where id=$1;',[req.params.id]);
+        await db.query('update grievance set sent_to_department_id=$2,status=\'sent to hr\' where id=$1;',[req.params.id,dept_id]);
         let hrs = await db.query('select user_id from user_department where department_id=$1;',[dept_id]);
         hrs = hrs.rows;
         let emp_data = await db.query('select emp_id from grievance where id=$1;',[req.params.id]);
