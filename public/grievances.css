@@ -1,0 +1,142 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+h2 {
+    color: #333;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input[type="text"], textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.grievance {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.grievance-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.grievance-desc {
+    margin-top: 5px;
+    color: #666;
+}
+
+.grievance-status {
+    margin-top: 5px;
+    color: #888;
+}
+
+#time {
+    font-style: italic;
+    color: #888;
+}
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+h2 {
+    color: #333;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input[type="text"], textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.grievance {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.grievance-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.grievance-desc {
+    margin-top: 5px;
+    color: #666;
+}
+
+.grievance-status {
+    margin-top: 5px;
+    color: #888;
+}
+
+#time {
+    font-style: italic;
+    color: #888;
+}

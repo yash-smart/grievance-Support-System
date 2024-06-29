@@ -84,7 +84,15 @@ app.post('/register',async (req,res) => {
         } else {
             bcrypt.hash(req.body.Password, 10, async function(err, hash) {
                 try {
-                    await db.query('insert into users(username,password,role,email) values($1,$2,$3,$4);',[req.body.Username.trim(),hash,req.body.Role,req.body.Email])
+                    // let department_ids = [];
+                    let user_id_data = await db.query('insert into users(username,password,role,email) values($1,$2,$3,$4) RETURNING user_id;',[req.body.Username.trim(),hash,req.body.Role,req.body.Email]);
+                    let user_id = user_id_data.rows[0].user_id;
+                    if (req.body.Department) {
+                        for (let i=0;i<req.body.Department.length;i++) {
+                            let id_data = await db.query('select id from department where department=$1;',[req.body.Department[i]]);
+                            await db.query('insert into user_department values($1,$2)',[user_id,id_data.rows[0].id]);
+                        }
+                    }
                     res.redirect('/login')
                 } catch (err) {
                     res.render('register.ejs',{message: 'Something went wrong. Try again.'})
@@ -107,7 +115,15 @@ app.get('/main/:user_id',async (req,res) => {
             let grievances_open_data = await db.query('select * from grievance where emp_id=$1 and status=\'open\' order by grievance_post_datetime desc',[req.params.user_id]);
             res.render('employee_main.ejs',{data:grievances_open_data.rows,user_id:req.params.user_id});
         } else if (user_details.role === 'Administrator') {
-            res.render('admin_main.ejs');
+            let grievance_data = await db.query('select * from grievance where status=\'open\' order by grievance_post_datetime desc;');
+            let departments = [];
+            for (let i=0;i<grievance_data.rows.length;i++) {
+                let dept_id = grievance_data.rows[i].department_id;
+                let department = await db.query('select department from department where id=$1;',[dept_id]);
+                department = department.rows[0].department;
+                departments.push(department);
+            }
+            res.render('admin_main.ejs',{grievance_data:grievance_data.rows,message:'Open',user_id:req.params.user_id,sendtohrbutton:true,departments:departments});
         } else {
             res.render('hr_main.ejs');
         }
@@ -148,6 +164,43 @@ app.get('/grievance/:id/:user_id',async (req,res) => {
 app.post('/postComment/:id/:user_id',async (req,res) => {
     await db.query('insert into comments(comment,sender,posted_on,grievance_id) values($1,$2,$3,$4);',[req.body.comment,req.params.user_id,new Date(),req.params.id]);
     res.redirect('/grievance/'+req.params.id+'/'+req.params.user_id);
+})
+
+app.post('/selectPostAdmin/:user_id',async(req,res) => {
+    let request = req.body.category.toLowerCase();
+    let data = await db.query('select * from grievance where status=\''+request+'\'order by grievance_post_datetime desc;');
+    if (request == 'open') {
+        let departments = [];
+        for (let i=0;i<data.rows.length;i++) {
+            let dept_id = data.rows[i].department_id;
+            let department = await db.query('select department from department where id=$1;',[dept_id]);
+            department = department.rows[0].department;
+            departments.push(department);
+        }
+        res.render('admin_main.ejs',{grievance_data:data.rows,message:req.body.category,user_id:req.params.user_id,sendtohrbutton:true,departments:departments});
+    } else {
+        let departments = [];
+        for (let i=0;i<data.rows.length;i++) {
+            let dept_id = data.rows[i].sent_to_department_id;
+            let department = await db.query('select department from department where id=$1;',[dept_id]);
+            department = department.rows[0].department;
+            departments.push(department);
+        }
+        res.render('admin_main.ejs',{grievance_data:data.rows,message:req.body.category,user_id:req.params.user_id,sendtohrbutton:false,departments:departments});
+    }
+})
+
+app.get('/sendToHR/:id/:user_id',async (req,res) => {
+    let dept_id = await db.query('select department_id from grievance where id=$1;',[req.params.id]);
+    dept_id = dept_id.rows[0].department_id
+    await db.query('update grievance set sent_to_department_id=$1,status=\'sent to hr\' where id=$1;',[req.params.id]);
+    res.redirect('/main/'+req.params.user_id);
+})
+
+app.post('/sendToHR/:id/:user_id',async (req,res) => {
+    let dept_id = await db.query('select id from department where department=$1;',[req.body.Department]);
+    await db.query('update grievance set sent_to_department_id=$1,status=\'sent to hr\' where id=$2;',[dept_id.rows[0].id,req.params.id]);
+    res.redirect('/main/'+req.params.user_id);
 })
 
 app.listen(3000,() => {
