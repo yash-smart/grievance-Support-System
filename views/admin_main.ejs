@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="/admin_main.css" >
 </head>
 <body>
     <h2><%= message %> Grievances</h2>
@@ -27,7 +28,7 @@
         <a href="/grievance/<%= grievance_data[i].id %>/<%= user_id %>" ><button>Open</button></a>
         <% if (sendtohrbutton) { %>
             <a href="/sendToHR/<%= grievance_data[i].id %>/<%= user_id %>"><button>Send To HR</button></a>
-            <p>Sent to some other department</p>
+            <p>Send to some other department</p>
             <form action="/sendToHR/<%= grievance_data[i].id %>/<%= user_id %>" method="post">
                 <select name="Department">
                     <option>Employee Relations</option>

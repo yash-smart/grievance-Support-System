@@ -263,6 +263,11 @@ app.post('/selectPostHR/:user_id',async (req,res) => {
     }
 })
 
+app.get('/close/:id/:user_id',async (req,res) => {
+    await db.query('update grievance set status=\'closed\' where id=$1;',[req.params.id]);
+    res.redirect('/main/'+req.params.user_id);
+})
+
 app.listen(3000,() => {
     console.log(`Connected on http://localhost:3000`)
 })
