@@ -22,6 +22,7 @@
         <p>Status: <%= data[i].status %></p>
         <p>Posted By: <%= poster[i] %></p>
         <p class="time"><%= data[i].grievance_post_datetime %></p>
+        <a href="/grievance/<%= data[i].id %>/<%= user_id %>"><button>Open</button></a>
         <% if (closedbutton) { %>
             <a href="/close/<%= data[i].id %>/<%= user_id %>"><button>Close Grievance</button></a>
         <% } %>
