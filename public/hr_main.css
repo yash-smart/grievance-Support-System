@@ -1,0 +1,115 @@
+/* General styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    color: #343a40;
+    margin: 20px 0;
+}
+
+h3 {
+    color: #007bff;
+    margin-bottom: 5px;
+}
+
+p {
+    color: #6c757d;
+    margin: 5px 0;
+}
+
+form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 500px;
+    gap: 10px;
+}
+
+select, input[type="submit"] {
+    margin: 5px;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+    width: 100%;
+    max-width: 200px;
+}
+
+input[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.grievance-item {
+    background-color: white;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+}
+
+.grievance-item h3 {
+    margin-top: 0;
+}
+
+.grievance-item p.time {
+    font-style: italic;
+    color: #868e96;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 4px;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    select, input[type="submit"], button {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .grievance-item {
+        padding: 10px;
+    }
+}

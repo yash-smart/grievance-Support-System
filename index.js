@@ -246,7 +246,7 @@ app.post('/selectPostHR/:user_id',async (req,res) => {
             poster.push(poster_data.rows[0].username);
         }
         if (request == 'sent to hr') {
-            res.render('hr_main.ejs',{user_id:req.params.user_id,data:data,message:'Send To HR',closedbutton:true,poster:poster});
+            res.render('hr_main.ejs',{user_id:req.params.user_id,data:data,message:'Sent To HR',closedbutton:true,poster:poster});
         } else {
             res.render('hr_main.ejs',{user_id:req.params.user_id,data:data,message:'Closed',closedbutton:false,poster:poster});
         }
