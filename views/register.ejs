@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/login.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Register</h1>
+        <form action="/register" method="POST">
+            <input type="text" name="Username" placeholder="Username" required>
+            <input type="password" name="Password" placeholder="Password" required>
+            <input type="email" name="Email" placeholder="Email" required>
+            <select name="Role">
+                <option>Employee</option>
+                <option>Administrator</option>
+                <option>HR</option>
+            </select>
+            <input type="submit" value="Register" style="margin: 5px;">
+        </form>
+        <% if (locals.message) { %>
+            <p style="color: red;"><%= message %></p>
+        <% } %>
+        <a href="/login" >Login here!</a>
+    </div>
+</body>
+</html>

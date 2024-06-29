@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grievance Support System</title>
+</head>
+<body>
+    <h2>Your Grievances</h2>
+    <form action="/selectPost" method="post">
+        <select>
+            <option>Open</option>
+            <option>Closed</option>
+            <option>Sent to HR</option>
+        </select>
+        <input type="submit" value="Submit">
+    </form>
+    <% for (let i=0;i<open.length;i++) {%>
+        <p><%= open[i].grievance_title %></p>
+        <p><%= open[i].grievance_desc %></p>
+        <p><%= open[i].department_id %></p>
+        <p><%= open[i].status %></p>
+        <p><%= open[i].grievance_post_datetime %></p>
+    <% } %>
+    <h2>Post new Grievance</h2>
+    <form action="/grievancePost" method="post">
+        <input type="text" name="Title" placeholder="Enter Title of Grievance">
+        <br>
+        <textarea name="Description" placeholder="Enter Details of Grievance" style="white-space: pre-wrap;"></textarea>
+        <br>
+        <label for="department">Department:</label>
+        <select>
+            <option>Employee Relations</option>
+            <option>Compensation and Benefits</option>
+            <option>Performance Management</option>
+            <option>Training and Development</option>
+            <option>Health and Safety</option>
+            <option>Diversity and Inclusion</option>
+            <option>Recruitment and Onboarding</option>
+            <option>Others</option>
+        </select>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
