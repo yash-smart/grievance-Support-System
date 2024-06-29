@@ -19,13 +19,16 @@
     <% for(let i=0;i<comments_data.length;i++) { %>
         <h3><%= senders[i] %></h3>
         <p style="white-space: pre-wrap;"><%= comments_data[i].comment %></p>
-        <p id="time2" ><%= comments_data[i].posted_on %></p>
+        <p class="time2" ><%= comments_data[i].posted_on %></p>
     <% } %>
 </body>
 <script>
     let date = new Date(document.getElementById('time').textContent);
     document.getElementById('time').textContent = 'Posted On: '+ date.getDate() + ' ' + date.toLocaleString('default', { month: 'long' }) + ' ' + date.getFullYear() + ' '+date.getHours()+':'+date.getMinutes();
-    let date2 = new Date(document.getElementById('time2').textContent)
-    document.getElementById('time2').textContent = 'Posted On: '+ date2.getDate() + ' ' + date2.toLocaleString('default', { month: 'long' }) + ' ' + date2.getFullYear() + ' '+date2.getHours()+':'+date2.getMinutes();
+    let elements = document.getElementsByClassName('time2');
+    for (let i=0;i<elements.length;i++) {
+        let date = new Date(elements[i].textContent);
+        elements[i].textContent = 'Posted On: '+ date.getDate() + ' ' + date.toLocaleString('default', { month: 'long' }) + ' ' + date.getFullYear() + ' '+date.getHours()+':'+date.getMinutes();
+    }
 </script>
 </html>

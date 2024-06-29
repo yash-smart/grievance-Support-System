@@ -117,15 +117,32 @@ app.get('/main/:user_id',async (req,res) => {
         } else if (user_details.role === 'Administrator') {
             let grievance_data = await db.query('select * from grievance where status=\'open\' order by grievance_post_datetime desc;');
             let departments = [];
+            let poster = [];
             for (let i=0;i<grievance_data.rows.length;i++) {
                 let dept_id = grievance_data.rows[i].department_id;
                 let department = await db.query('select department from department where id=$1;',[dept_id]);
                 department = department.rows[0].department;
                 departments.push(department);
+                let poster_data = await db.query('select username from users where user_id=$1;',[grievance_data.rows[i].emp_id]);
+                poster.push(poster_data.rows[0].username);
             }
-            res.render('admin_main.ejs',{grievance_data:grievance_data.rows,message:'Open',user_id:req.params.user_id,sendtohrbutton:true,departments:departments});
+            res.render('admin_main.ejs',{grievance_data:grievance_data.rows,message:'Open',user_id:req.params.user_id,sendtohrbutton:true,departments:departments,poster:poster});
         } else {
-            res.render('hr_main.ejs');
+            let departments = await db.query('select department_id from user_department where user_id=$1;',[req.params.user_id]);
+            departments = departments.rows;
+            let data = [];
+            for (let i=0;i<departments.length;i++) {
+                let grievance_data = await db.query('select * from grievance where sent_to_department_id=$1 and status=\'sent to hr\';',[departments[i].department_id]);
+                grievance_data = grievance_data.rows;
+                data = [...data,...grievance_data];
+            }
+            let poster = [];
+            for (let i=0;i<data.length;i++) {
+                let emp_no = data[i].emp_id;
+                let poster_data = await db.query('select username from users where user_id=$1;',[emp_no]);
+                poster.push(poster_data.rows[0].username);
+            }
+            res.render('hr_main.ejs',{user_id:req.params.user_id,data:data,message:'Sent To HR',closedbutton:true,poster:poster});
         }
     } else {
         res.send('Unauthorised');
@@ -171,22 +188,30 @@ app.post('/selectPostAdmin/:user_id',async(req,res) => {
     let data = await db.query('select * from grievance where status=\''+request+'\'order by grievance_post_datetime desc;');
     if (request == 'open') {
         let departments = [];
+        let poster = [];
         for (let i=0;i<data.rows.length;i++) {
             let dept_id = data.rows[i].department_id;
+            let emp_id = data.rows[i].emp_id;
             let department = await db.query('select department from department where id=$1;',[dept_id]);
             department = department.rows[0].department;
+            let poster_data = await db.query('select username from users where user_id=$1;',[emp_id]);
+            poster.push(poster_data.rows[0].username);
             departments.push(department);
         }
-        res.render('admin_main.ejs',{grievance_data:data.rows,message:req.body.category,user_id:req.params.user_id,sendtohrbutton:true,departments:departments});
+        res.render('admin_main.ejs',{grievance_data:data.rows,message:req.body.category,user_id:req.params.user_id,sendtohrbutton:true,departments:departments,poster:poster});
     } else {
         let departments = [];
+        let poster = [];
         for (let i=0;i<data.rows.length;i++) {
             let dept_id = data.rows[i].sent_to_department_id;
+            let emp_id = data.rows[i].emp_id;
             let department = await db.query('select department from department where id=$1;',[dept_id]);
             department = department.rows[0].department;
+            let poster_data = await db.query('select username from users where user_id=$1;',[emp_id]);
+            poster.push(poster_data.rows[0].username);
             departments.push(department);
         }
-        res.render('admin_main.ejs',{grievance_data:data.rows,message:req.body.category,user_id:req.params.user_id,sendtohrbutton:false,departments:departments});
+        res.render('admin_main.ejs',{grievance_data:data.rows,message:req.body.category,user_id:req.params.user_id,sendtohrbutton:false,departments:departments,poster:poster});
     }
 })
 
@@ -201,6 +226,41 @@ app.post('/sendToHR/:id/:user_id',async (req,res) => {
     let dept_id = await db.query('select id from department where department=$1;',[req.body.Department]);
     await db.query('update grievance set sent_to_department_id=$1,status=\'sent to hr\' where id=$2;',[dept_id.rows[0].id,req.params.id]);
     res.redirect('/main/'+req.params.user_id);
+})
+
+app.post('/selectPostHR/:user_id',async (req,res) => {
+    let request = req.body.category.toLowerCase();
+    if (request !== 'open') {
+        let departments = await db.query('select department_id from user_department where user_id=$1;',[req.params.user_id]);
+        departments = departments.rows;
+        let data = [];
+        for (let i=0;i<departments.length;i++) {
+            let grievance_data = await db.query('select * from grievance where sent_to_department_id=$1 and status=\''+request+'\';',[departments[i].department_id]);
+            grievance_data = grievance_data.rows;
+            data = [...data,...grievance_data];
+        }
+        let poster = [];
+        for (let i=0;i<data.length;i++) {
+            let emp_no = data[i].emp_id;
+            let poster_data = await db.query('select username from users where user_id=$1;',[emp_no]);
+            poster.push(poster_data.rows[0].username);
+        }
+        if (request == 'sent to hr') {
+            res.render('hr_main.ejs',{user_id:req.params.user_id,data:data,message:'Send To HR',closedbutton:true,poster:poster});
+        } else {
+            res.render('hr_main.ejs',{user_id:req.params.user_id,data:data,message:'Closed',closedbutton:false,poster:poster});
+        }
+    } else {
+        let data = await db.query('select * from grievance where status=\'open\';')
+        data = data.rows;
+        let poster = [];
+        for (let i=0;i<data.length;i++) {
+            let emp_no = data[i].emp_id;
+            let poster_data = await db.query('select username from users where user_id=$1;',[emp_no]);
+            poster.push(poster_data.rows[0].username);
+        }
+        res.render('hr_main.ejs',{user_id:req.params.user_id,data:data,message:'Open',closedbutton:false,poster:poster});
+    }
 })
 
 app.listen(3000,() => {
