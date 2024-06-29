@@ -4,32 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grievance Support System</title>
+    <style>
+        p {
+            white-space: pre-wrap;
+        }
+    </style>
 </head>
 <body>
     <h2>Your Grievances</h2>
-    <form action="/selectPost" method="post">
-        <select>
+    <form action="/selectPost/<%= user_id %>" method="post">
+        <select name="category">
             <option>Open</option>
             <option>Closed</option>
             <option>Sent to HR</option>
         </select>
         <input type="submit" value="Submit">
     </form>
-    <% for (let i=0;i<open.length;i++) {%>
-        <p><%= open[i].grievance_title %></p>
-        <p><%= open[i].grievance_desc %></p>
-        <p><%= open[i].department_id %></p>
-        <p><%= open[i].status %></p>
-        <p><%= open[i].grievance_post_datetime %></p>
+    <% for (let i=0;i<data.length;i++) {%>
+        <p><%= data[i].grievance_title %></p>
+        <p><%= data[i].grievance_desc %></p>
+        <p>Status: <%= data[i].status %></p>
+        <p id="time">Posted On: <%= data[i].grievance_post_datetime %></p>
     <% } %>
     <h2>Post new Grievance</h2>
-    <form action="/grievancePost" method="post">
+    <form action="/grievancePost/<%= user_id %>" method="post">
         <input type="text" name="Title" placeholder="Enter Title of Grievance">
         <br>
         <textarea name="Description" placeholder="Enter Details of Grievance" style="white-space: pre-wrap;"></textarea>
         <br>
         <label for="department">Department:</label>
-        <select>
+        <select name="Department">
             <option>Employee Relations</option>
             <option>Compensation and Benefits</option>
             <option>Performance Management</option>
@@ -43,4 +47,8 @@
         <input type="submit" value="Submit">
     </form>
 </body>
+<script>
+    let date = new Date(document.getElementById('time').textContent);
+    document.getElementById('time').textContent = 'Posted On: '+ date.getDate() + ' ' + date.toLocaleString('default', { month: 'long' }) + ' ' + date.getFullYear() + ' '+date.getHours()+':'+date.getMinutes();
+</script>
 </html>

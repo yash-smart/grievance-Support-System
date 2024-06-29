@@ -103,10 +103,9 @@ app.get('/main/:user_id',async (req,res) => {
         let user_details = await db.query('select * from users where user_id=$1;',[req.params.user_id]);
         user_details = user_details.rows[0];
         if (user_details.role === 'Employee') {
-            let grievances_open_data = await db.query('select * from grievance where emp_id=$1 and status=\'Open\' order by grievance_post_datetime desc',[req.params.user_id]);
-            let grievances_closed_data = await db.query('select * from grievance where emp_id=$1 and status=\'Closed\' order by grievance_post_datetime desc',[req.params.user_id]);
-            let grievances_sent_data = await db.query('select * from grievance where emp_id=$1 and status=\'Sent to HR\' order by grievance_post_datetime desc',[req.params.user_id]);
-            res.render('employee_main.ejs',{open:grievances_open_data.rows,closed:grievances_closed_data.rows,sent:grievances_sent_data.rows});
+            console.log(req.params.user_id)
+            let grievances_open_data = await db.query('select * from grievance where emp_id=$1 and status=\'open\' order by grievance_post_datetime desc',[req.params.user_id]);
+            res.render('employee_main.ejs',{data:grievances_open_data.rows,user_id:req.params.user_id});
         } else if (user_details.role === 'Administrator') {
             res.render('admin_main.ejs');
         } else {
@@ -118,13 +117,21 @@ app.get('/main/:user_id',async (req,res) => {
     
 })
 
-app.post('/grievancePost',async (req,res) => {
+app.post('/grievancePost/:user_id',async (req,res) => {
     try {
-        await db.query('insert into grievance values(emp_id,grievance_title')
+        let department_data = await db.query('select id from department where department=$1;',[req.body.Department]);
+        await db.query('insert into grievance(emp_id,grievance_title,grievance_desc,department_id,status,grievance_post_datetime) values($1,$2,$3,$4,\'open\',$5);',[req.params.user_id,req.body.Title,req.body.Description,department_data.rows[0].id,new Date()]);
+        res.redirect('/main/'+req.params.user_id)
     } catch (err) {
         res.send('Something Went Wrong!')
     }
 });
+
+app.post('/selectPost/:user_id',async (req,res) => {
+    let request = req.body.category.toLowerCase();
+    let data = await db.query('select * from grievance where emp_id = $1 and status=\''+request+'\';',[req.params.user_id]);
+    res.render('employee_main.ejs',{user_id:req.params.user_id,data:data.rows});
+})
 
 app.listen(3000,() => {
     console.log(`Connected on http://localhost:3000`)
