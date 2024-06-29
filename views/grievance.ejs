@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2><%= grievance_data.grievance_title %></h2>
+    <p><%= grievance_data.grievance_desc %></p>
+    <p>Status: <%= grievance_data.status %></p>
+    <p id="time"><%= grievance_data.grievance_post_datetime %></p>
+    <form action="/postComment/<%= grievance_id %>/<%= user_id %>" method="post">
+        <textarea name="comment" style="white-space: pre-wrap;"></textarea>
+        <input type="submit" value="Send">
+    </form>
+    <h3>Comments</h3>
+    <% for(let i=0;i<comments_data.length;i++) { %>
+        <h3><%= senders[i] %></h3>
+        <p style="white-space: pre-wrap;"><%= comments_data[i].comment %></p>
+        <p id="time2" ><%= comments_data[i].posted_on %></p>
+    <% } %>
+</body>
+<script>
+    let date = new Date(document.getElementById('time').textContent);
+    document.getElementById('time').textContent = 'Posted On: '+ date.getDate() + ' ' + date.toLocaleString('default', { month: 'long' }) + ' ' + date.getFullYear() + ' '+date.getHours()+':'+date.getMinutes();
+    let date2 = new Date(document.getElementById('time2').textContent)
+    document.getElementById('time2').textContent = 'Posted On: '+ date2.getDate() + ' ' + date2.toLocaleString('default', { month: 'long' }) + ' ' + date2.getFullYear() + ' '+date2.getHours()+':'+date2.getMinutes();
+</script>
+</html>

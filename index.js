@@ -133,6 +133,23 @@ app.post('/selectPost/:user_id',async (req,res) => {
     res.render('employee_main.ejs',{user_id:req.params.user_id,data:data.rows});
 })
 
+app.get('/grievance/:id/:user_id',async (req,res) => {
+    let grievance_data = await db.query('select * from grievance where id=$1;',[req.params.id]);
+    let comments_data = await db.query('select * from comments where grievance_id=$1 order by posted_on desc;',[req.params.id]);
+    comments_data =comments_data.rows;
+    let senders = [];
+    for (let i=0;i<comments_data.length;i++) {
+        let sender_data = await db.query('select username from users where user_id=$1;',[comments_data[i].sender]);
+        senders.push(sender_data.rows[0].username);
+    }
+    res.render('grievance.ejs',{comments_data:comments_data,senders:senders,grievance_data:grievance_data.rows[0],grievance_id:req.params.id,user_id:req.params.user_id});
+});
+
+app.post('/postComment/:id/:user_id',async (req,res) => {
+    await db.query('insert into comments(comment,sender,posted_on,grievance_id) values($1,$2,$3,$4);',[req.body.comment,req.params.user_id,new Date(),req.params.id]);
+    res.redirect('/grievance/'+req.params.id+'/'+req.params.user_id);
+})
+
 app.listen(3000,() => {
     console.log(`Connected on http://localhost:3000`)
 })

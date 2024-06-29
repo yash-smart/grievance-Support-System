@@ -9,6 +9,7 @@
             white-space: pre-wrap;
         }
     </style>
+    <link rel="stylesheet" href="/employee_main.css">
 </head>
 <body>
     <h2>Your Grievances</h2>
@@ -25,6 +26,7 @@
         <p><%= data[i].grievance_desc %></p>
         <p>Status: <%= data[i].status %></p>
         <p id="time">Posted On: <%= data[i].grievance_post_datetime %></p>
+        <a href="/grievance/<%= data[i].id %>/<%= user_id %>"><button>Open</button></a>
     <% } %>
     <h2>Post new Grievance</h2>
     <form action="/grievancePost/<%= user_id %>" method="post">
