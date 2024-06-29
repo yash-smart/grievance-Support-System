@@ -9,6 +9,16 @@ import nodemailer from "nodemailer";
 
 env.config();
 
+console.log(process.env.EMAIL_PASSWORD);
+
+const transporter = nodemailer.createTransport({
+    service:'gmail',
+    auth: {
+        user:'smartyash334@gmail.com',
+        pass:process.env.EMAIL_PASSWORD
+    }
+})
+
 const app = express();
 
 const db = new pg.Client({
@@ -152,8 +162,27 @@ app.get('/main/:user_id',async (req,res) => {
 
 app.post('/grievancePost/:user_id',async (req,res) => {
     try {
+        let username_data = await db.query('select username from users where user_id=$1;',[req.params.user_id]);
+        let username = username_data.rows[0].username;
         let department_data = await db.query('select id from department where department=$1;',[req.body.Department]);
         await db.query('insert into grievance(emp_id,grievance_title,grievance_desc,department_id,status,grievance_post_datetime) values($1,$2,$3,$4,\'open\',$5);',[req.params.user_id,req.body.Title,req.body.Description,department_data.rows[0].id,new Date()]);
+        let admin_data = await db.query('select email from users where role=\'Administrator\';');
+        admin_data = admin_data.rows;
+        for (let i=0;i<admin_data.length;i++) {
+            let mailOptions = {
+                from:'smartyash334@gmail.com',
+                to:admin_data[i].email,
+                subject:'Got a grievance from '+username,
+                text:'Grievance_title: '+req.body.Title
+            }
+            transporter.sendMail(mailOptions,(error,info)=> {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent successfully');
+                }
+            });
+        }
         res.redirect('/main/'+req.params.user_id)
     } catch (err) {
         res.send('Something Went Wrong!')
@@ -219,12 +248,60 @@ app.get('/sendToHR/:id/:user_id',async (req,res) => {
     let dept_id = await db.query('select department_id from grievance where id=$1;',[req.params.id]);
     dept_id = dept_id.rows[0].department_id
     await db.query('update grievance set sent_to_department_id=$1,status=\'sent to hr\' where id=$1;',[req.params.id]);
+    let hrs = await db.query('select user_id from user_department where department_id=$1;',[dept_id]);
+    hrs = hrs.rows;
+    let emp_data = await db.query('select emp_id from grievance where id=$1;',[req.params.id]);
+    let employee_username = await db.query('select username from users where user_id=$1;',[emp_data.rows[0].emp_id]);
+    employee_username = employee_username.rows[0].username;
+    let grievance_data = await db.query('select grievance_title from grievance where id=$1;',[req.params.id]);
+    grievance_data = grievance_data.rows[0].grievance_title;
+    for (let i=0;i<hrs.length;i++) {
+        let hr_id = hrs[i].user_id;
+        let email = await db.query('select email from users where user_id=$1;',[hr_id])
+        let mailOptions = {
+            from:'smartyash334@gmail.com',
+            to:email.rows[0].email,
+            subject:'Got an grievance from '+employee_username,
+            text:'Grievance Title: '+grievance_data
+        }
+        transporter.sendMail(mailOptions,(error,info)=> {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent successfully');
+            }
+        })
+    }
     res.redirect('/main/'+req.params.user_id);
 })
 
 app.post('/sendToHR/:id/:user_id',async (req,res) => {
     let dept_id = await db.query('select id from department where department=$1;',[req.body.Department]);
     await db.query('update grievance set sent_to_department_id=$1,status=\'sent to hr\' where id=$2;',[dept_id.rows[0].id,req.params.id]);
+    let hrs = await db.query('select user_id from user_department where department_id=$1;',[dept_id.rows[0].id]);
+    hrs = hrs.rows;
+    let emp_data = await db.query('select emp_id from grievance where id=$1;',[req.params.id]);
+    let employee_username = await db.query('select username from users where user_id=$1;',[emp_data.rows[0].emp_id]);
+    employee_username = employee_username.rows[0].username;
+    let grievance_data = await db.query('select grievance_title from grievance where id=$1;',[req.params.id]);
+    grievance_data = grievance_data.rows[0].grievance_title;
+    for (let i=0;i<hrs.length;i++) {
+        let hr_id = hrs[i].user_id;
+        let email = await db.query('select email from users where user_id=$1;',[hr_id])
+        let mailOptions = {
+            from:'smartyash334@gmail.com',
+            to:email.rows[0].email,
+            subject:'Got an grievance from '+employee_username,
+            text:'Grievance Title: '+grievance_data
+        }
+        transporter.sendMail(mailOptions,(error,info)=> {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent successfully');
+            }
+        })
+    }
     res.redirect('/main/'+req.params.user_id);
 })
 
